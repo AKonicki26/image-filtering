@@ -6,12 +6,12 @@ Hosted at https://image-filtering-three.vercel.app/
 
 ## Features
 
-### 🖼️ Image Upload
+### Image Upload
 - Drag and drop or click to upload any image
 - Supports all common image formats (JPG, PNG, GIF, WebP, etc.)
 - Instant preview of the uploaded image
 
-### 🎨 Filters
+### Filters
 
 #### 1. Gaussian Blur
 Apply a smooth, professional blur effect to your images.
