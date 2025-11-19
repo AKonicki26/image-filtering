@@ -1,0 +1,100 @@
+.gaussian-blur-controls {
+    padding: 1rem;
+    background-color: rgba(100, 108, 255, 0.05);
+    border-radius: 8px;
+    border: 1px solid rgba(100, 108, 255, 0.2);
+}
+
+.gaussian-blur-controls h3 {
+    margin: 0 0 1rem 0;
+    color: #646cff;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.gaussian-blur-controls .control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.gaussian-blur-controls label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.gaussian-blur-controls .control-label {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #aaa;
+}
+
+.gaussian-blur-controls .control-description {
+    font-size: 0.85rem;
+    color: #888;
+    font-style: italic;
+    margin-bottom: 0.25rem;
+}
+
+.gaussian-blur-controls .range-slider {
+    width: 100%;
+    height: 6px;
+    border-radius: 3px;
+    background: linear-gradient(to right, #646cff 0%, #646cff 50%, #444 50%, #444 100%);
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+    cursor: pointer;
+}
+
+.gaussian-blur-controls .range-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #646cff;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: all 0.2s ease;
+}
+
+.gaussian-blur-controls .range-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+    box-shadow: 0 3px 6px rgba(100, 108, 255, 0.4);
+}
+
+.gaussian-blur-controls .range-slider::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #646cff;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: all 0.2s ease;
+}
+
+.gaussian-blur-controls .range-slider::-moz-range-thumb:hover {
+    transform: scale(1.2);
+    box-shadow: 0 3px 6px rgba(100, 108, 255, 0.4);
+}
+
+@media (prefers-color-scheme: light) {
+    .gaussian-blur-controls {
+        background-color: rgba(100, 108, 255, 0.08);
+    }
+
+    .gaussian-blur-controls h3 {
+        color: #535bf2;
+    }
+
+    .gaussian-blur-controls .control-label {
+        color: #555;
+    }
+
+    .gaussian-blur-controls .control-description {
+        color: #666;
+    }
+}
