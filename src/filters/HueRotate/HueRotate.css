@@ -1,0 +1,110 @@
+.hue-rotate-controls {
+    padding: 1rem;
+    background-color: rgba(255, 87, 34, 0.05);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 87, 34, 0.2);
+}
+
+.hue-rotate-controls h3 {
+    margin: 0 0 1rem 0;
+    color: #ff5722;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.hue-rotate-controls .control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.hue-rotate-controls label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.hue-rotate-controls .control-label {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #aaa;
+}
+
+.hue-rotate-controls .control-description {
+    font-size: 0.85rem;
+    color: #888;
+    font-style: italic;
+    margin-bottom: 0.25rem;
+}
+
+.hue-rotate-controls .hue-slider {
+    width: 100%;
+    height: 8px;
+    border-radius: 4px;
+    background: linear-gradient(
+        to right,
+        hsl(0, 100%, 50%) 0%,
+        hsl(60, 100%, 50%) 16.666%,
+        hsl(120, 100%, 50%) 33.333%,
+        hsl(180, 100%, 50%) 50%,
+        hsl(240, 100%, 50%) 66.666%,
+        hsl(300, 100%, 50%) 83.333%,
+        hsl(360, 100%, 50%) 100%
+    );
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+    cursor: pointer;
+}
+
+.hue-rotate-controls .hue-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: white;
+    border: 3px solid #ff5722;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    transition: all 0.2s ease;
+}
+
+.hue-rotate-controls .hue-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+    box-shadow: 0 3px 6px rgba(255, 87, 34, 0.5);
+}
+
+.hue-rotate-controls .hue-slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: white;
+    border: 3px solid #ff5722;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    transition: all 0.2s ease;
+}
+
+.hue-rotate-controls .hue-slider::-moz-range-thumb:hover {
+    transform: scale(1.2);
+    box-shadow: 0 3px 6px rgba(255, 87, 34, 0.5);
+}
+
+@media (prefers-color-scheme: light) {
+    .hue-rotate-controls {
+        background-color: rgba(255, 87, 34, 0.08);
+    }
+
+    .hue-rotate-controls h3 {
+        color: #e64a19;
+    }
+
+    .hue-rotate-controls .control-label {
+        color: #555;
+    }
+
+    .hue-rotate-controls .control-description {
+        color: #666;
+    }
+}

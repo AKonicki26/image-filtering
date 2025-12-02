@@ -1,6 +1,6 @@
 import { useState, useRef, type ChangeEvent, useCallback } from 'react';
 import './ImageTransformer.css';
-import {type IImageFilter, GaussianBlurFilter, BlackAndWhiteFilter } from '../../filters';
+import {type IImageFilter, GaussianBlurFilter, BlackAndWhiteFilter, HueRotateFilter, SharpenFilter } from '../../filters';
 
 export default function ImageTransformer() {
     const [uploadedImage, setUploadedImage] = useState<string | null>(null);
@@ -15,6 +15,8 @@ export default function ImageTransformer() {
     const [filters] = useState<IImageFilter[]>([
         new GaussianBlurFilter(),
         new BlackAndWhiteFilter(),
+        new HueRotateFilter(),
+        new SharpenFilter(),
     ]);
 
     // Load image and convert to ImageData
