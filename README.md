@@ -1,79 +1,122 @@
-# Image Filter Tool
-
+# Image Filtering Tool
 A React + TypeScript web application for applying image filters with real-time preview.
 
-Hosted at https://image-filtering-three.vercel.app/
+**Live Site:** https://image-filtering-three.vercel.app/
 
 ## Features
 
-### Image Upload
-- Drag and drop or click to upload any image
-- Supports all common image formats (JPG, PNG, GIF, WebP, etc.)
-- Instant preview of the uploaded image
+- **Image Upload**: Drag and drop or click to upload images from your device
+- **4 Filter Options**:
+    - **Gaussian Blur** - Smooth blur effect with adjustable radius and intensity
+    - **Black & White** - Grayscale conversion with contrast and brightness controls
+    - **Hue Rotate** - Shift colors around the color wheel (0-360°)
+    - **Sharpen** - Enhance edges and details with adjustable intensity
+- **Real-time Preview**: See changes instantly as you adjust filter settings
+- **Side-by-Side Comparison**: View original and filtered images simultaneously
+- **Interactive Controls**: Sliders for fine-tuning each filter's parameters
 
-### Filters
+## Technologies & Dependencies
 
-#### 1. Gaussian Blur
-Apply a smooth, professional blur effect to your images.
+**Programming Languages:**
+- TypeScript 5.x
+- HTML5 Canvas API
 
-**Controls:**
-- **Radius (1-10)**: Controls the size of the blur kernel. Higher values = stronger blur.
-- **Intensity (0.5-5.0)**: Controls the Gaussian sigma value. Higher values = softer, more spread-out blur.
+**Framework & Libraries:**
+- React 19.2.0
+- React DOM 19.2.0
+- Vite (build tool)
 
+**Development Dependencies:**
+- @types/node ^20
+- @types/react ^19
+- @types/react-dom ^19
+- @typescript-eslint/eslint-plugin 8.47.0
+- @typescript-eslint/parser 8.47.0
+- @vitejs/plugin-react 4.3.4
+- eslint 9.x
+- typescript 5.x
+- vite 6.x
 
-#### 2. Black & White
-Convert images to grayscale with adjustable contrast and brightness.
+## Setup Instructions
 
-**Controls:**
-- **Contrast (-100 to +100)**: Adjusts the difference between light and dark areas
-    - Negative values: Reduced contrast (flatter image)
-    - Positive values: Increased contrast (more dramatic)
-- **Brightness (-100 to +100)**: Adjusts overall image brightness
-    - Negative values: Darker image
-    - Positive values: Brighter image
-
-
-## How to Use
-
-1. **Upload an Image**: Click "Choose Image" and select a file
-2. **Select a Filter**: Click on "Gaussian Blur" or "Black & White"
-3. **Adjust Settings**: Use the sliders to fine-tune the filter effect
-4. **View Results**: See the original and filtered images side-by-side
-
-## Installation
-
+### Clone the Repository
 ```bash
-# Install dependencies
+git clone https://github.com/AKonicki26/image-filtering
+cd image-filter
+```
+
+### Install Dependencies
+```bash
 npm install
+```
 
-# Run development server
+### Run Locally
+```bash
 npm run dev
+```
 
-# Build for production
+The app will open at `http://localhost:5173` (or whatever port Vite assigns).
+
+### Build for Production
+```bash
 npm run build
 ```
 
-## Filter Implementation Notes
+The optimized build will be in the `dist` folder.
 
-### Gaussian Blur
-The Gaussian blur is implemented using a separable convolution:
-1. Generate 1D Gaussian kernel based on radius and sigma
-2. Apply horizontal pass across all rows
-3. Apply vertical pass across all columns
-4. Normalize the kernel to maintain brightness
+## File Structure
 
-### Black & White
-The grayscale conversion uses the luminosity method which accounts for human perception:
-- Red: 29.9% weight
-- Green: 58.7% weight (highest because humans are most sensitive to green)
-- Blue: 11.4% weight
+```
+image-filter/
+├── src/
+│   ├── components/
+│   │   └── ImageTransformer/
+│   │       ├── ImageTransformer.tsx       # Main component with upload/display logic
+│   │       └── ImageTransformer.css       # Component styles
+│   ├── filters/
+│   │   ├── IImageFilter.tsx               # Interface all filters implement
+│   │   ├── index.tsx                      # Central export for all filters
+│   │   ├── GaussianBlur/
+│   │   │   ├── GaussianBlurFilter.tsx     # Blur algorithm implementation
+│   │   │   ├── GaussianBlurControls.tsx   # UI controls for blur settings
+│   │   │   └── GaussianBlur.css           # Blur control styles
+│   │   ├── BlackAndWhite/
+│   │   │   ├── BlackAndWhiteFilter.tsx    # Grayscale algorithm
+│   │   │   ├── BlackAndWhiteControls.tsx  # UI controls for B&W settings
+│   │   │   └── BlackAndWhite.css          # B&W control styles
+│   │   ├── HueRotate/
+│   │   │   ├── HueRotateFilter.tsx        # Hue rotation algorithm
+│   │   │   ├── HueRotateControls.tsx      # UI controls for hue rotation
+│   │   │   └── HueRotate.css              # Hue rotate control styles
+│   │   └── Sharpen/
+│   │       ├── SharpenFilter.tsx          # Sharpening algorithm
+│   │       ├── SharpenControls.tsx        # UI controls for sharpen settings
+│   │       └── Sharpen.css                # Sharpen control styles
+│   ├── App.tsx                            # Root component
+│   ├── App.css                            # App-level styles
+│   ├── main.tsx                           # React entry point
+│   └── index.css                          # Global styles
+├── public/                                 # Static assets
+├── index.html                             # HTML entry point
+├── package.json                           # Dependencies and scripts
+├── tsconfig.json                          # TypeScript configuration
+├── vite.config.ts                         # Vite build configuration
+└── README.md                              # This file
+```
 
-Contrast is applied using the formula:
-```
-newValue = ((value - 128) × contrastFactor) + 128
-```
+**Key Files Explained:**
+- `ImageTransformer.tsx`: Handles image upload, manages filter state, and coordinates between the UI and filter logic
+- `IImageFilter.tsx`: Defines the interface that all filters must implement (apply, getControls, reset, clone)
+- Each filter folder contains three files: the algorithm, the controls component, and the styles
+- `filters/index.tsx`: Exports all filters so they can be imported together
 
-Brightness is applied as a simple offset:
-```
-newValue = value + brightnessOffset
-```
+## How It Works
+
+1. Upload an image through the UI
+2. The image is converted to `ImageData` using HTML5 Canvas
+3. Select a filter from the available options
+4. Adjust filter parameters using the sliders
+5. The filter's `apply()` method processes the ImageData pixel-by-pixel
+6. The filtered result is displayed alongside the original
+
+Each filter implements the `IImageFilter` interface, making it easy to add new filters by following the same pattern.
