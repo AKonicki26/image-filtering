@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { BlackAndWhiteFilter } from './BlackAndWhiteFilter';
 import './BlackAndWhite.css';
 
@@ -10,11 +10,28 @@ interface BlackAndWhiteControlsProps {
 function BlackAndWhiteControls({ filter, onChange }: BlackAndWhiteControlsProps) {
     const [contrast, setContrast] = useState(filter.contrast);
     const [brightness, setBrightness] = useState(filter.brightness);
+    const contrastRef = useRef<HTMLInputElement>(null);
+    const brightnessRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         setContrast(filter.contrast);
         setBrightness(filter.brightness);
     }, [filter]);
+
+    // Update slider backgrounds based on values
+    useEffect(() => {
+        if (contrastRef.current) {
+            const percentage = ((contrast - (-100)) / (100 - (-100))) * 100;
+            contrastRef.current.style.background = `linear-gradient(to right, #888 0%, #888 ${percentage}%, #444 ${percentage}%, #444 100%)`;
+        }
+    }, [contrast]);
+
+    useEffect(() => {
+        if (brightnessRef.current) {
+            const percentage = ((brightness - (-100)) / (100 - (-100))) * 100;
+            brightnessRef.current.style.background = `linear-gradient(to right, #888 0%, #888 ${percentage}%, #444 ${percentage}%, #444 100%)`;
+        }
+    }, [brightness]);
 
     const handleContrastChange = (value: number) => {
         setContrast(value);
@@ -36,6 +53,7 @@ function BlackAndWhiteControls({ filter, onChange }: BlackAndWhiteControlsProps)
                     <span className="control-label">Contrast: {contrast}</span>
                     <span className="control-description">Adjust the difference between light and dark</span>
                     <input
+                        ref={contrastRef}
                         type="range"
                         min="-100"
                         max="100"
@@ -49,6 +67,7 @@ function BlackAndWhiteControls({ filter, onChange }: BlackAndWhiteControlsProps)
                     <span className="control-label">Brightness: {brightness}</span>
                     <span className="control-description">Adjust overall image brightness</span>
                     <input
+                        ref={brightnessRef}
                         type="range"
                         min="-100"
                         max="100"

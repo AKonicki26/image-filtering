@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { SharpenFilter } from './SharpenFilter';
 import './Sharpen.css';
 
@@ -9,10 +9,19 @@ interface SharpenControlsProps {
 
 function SharpenControls({ filter, onChange }: SharpenControlsProps) {
     const [amount, setAmount] = useState(filter.amount);
+    const amountRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         setAmount(filter.amount);
     }, [filter]);
+
+    // Update slider background based on value
+    useEffect(() => {
+        if (amountRef.current) {
+            const percentage = ((amount - 0) / (3 - 0)) * 100;
+            amountRef.current.style.background = `linear-gradient(to right, #4caf50 0%, #4caf50 ${percentage}%, #444 ${percentage}%, #444 100%)`;
+        }
+    }, [amount]);
 
     const handleAmountChange = (value: number) => {
         setAmount(value);
@@ -28,6 +37,7 @@ function SharpenControls({ filter, onChange }: SharpenControlsProps) {
                     <span className="control-label">Amount: {amount.toFixed(1)}</span>
                     <span className="control-description">Intensity of edge enhancement</span>
                     <input
+                        ref={amountRef}
                         type="range"
                         min="0"
                         max="3"

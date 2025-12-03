@@ -42,19 +42,34 @@
     height: 8px;
     border-radius: 4px;
     background: linear-gradient(
-        to right,
-        hsl(0, 100%, 50%) 0%,
-        hsl(60, 100%, 50%) 16.666%,
-        hsl(120, 100%, 50%) 33.333%,
-        hsl(180, 100%, 50%) 50%,
-        hsl(240, 100%, 50%) 66.666%,
-        hsl(300, 100%, 50%) 83.333%,
-        hsl(360, 100%, 50%) 100%
+            to right,
+            hsl(0, 100%, 50%) 0%,
+            hsl(60, 100%, 50%) 16.666%,
+            hsl(120, 100%, 50%) 33.333%,
+            hsl(180, 100%, 50%) 50%,
+            hsl(240, 100%, 50%) 66.666%,
+            hsl(300, 100%, 50%) 83.333%,
+            hsl(360, 100%, 50%) 100%
     );
     outline: none;
     -webkit-appearance: none;
     appearance: none;
     cursor: pointer;
+    position: relative;
+    --fill-percentage: 0%;
+}
+
+/* Add a semi-transparent overlay for unfilled portion */
+.hue-rotate-controls .hue-slider::before {
+    content: '';
+    position: absolute;
+    left: var(--fill-percentage);
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background: rgba(68, 68, 68, 0.6);
+    border-radius: 4px;
+    pointer-events: none;
 }
 
 .hue-rotate-controls .hue-slider::-webkit-slider-thumb {

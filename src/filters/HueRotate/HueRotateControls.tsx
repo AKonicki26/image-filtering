@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { HueRotateFilter } from './HueRotateFilter';
 import './HueRotate.css';
 
@@ -9,10 +9,20 @@ interface HueRotateControlsProps {
 
 function HueRotateControls({ filter, onChange }: HueRotateControlsProps) {
     const [degrees, setDegrees] = useState(filter.degrees);
+    const sliderRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         setDegrees(filter.degrees);
     }, [filter]);
+
+    // Update slider overlay based on value
+    useEffect(() => {
+        if (sliderRef.current) {
+            const percentage = (degrees / 360) * 100;
+            // For the hue slider, we'll use a semi-transparent overlay approach
+            sliderRef.current.style.setProperty('--fill-percentage', `${percentage}%`);
+        }
+    }, [degrees]);
 
     const handleDegreesChange = (value: number) => {
         setDegrees(value);
@@ -28,6 +38,7 @@ function HueRotateControls({ filter, onChange }: HueRotateControlsProps) {
                     <span className="control-label">Rotation: {degrees}°</span>
                     <span className="control-description">Rotate colors around the color wheel</span>
                     <input
+                        ref={sliderRef}
                         type="range"
                         min="0"
                         max="360"
