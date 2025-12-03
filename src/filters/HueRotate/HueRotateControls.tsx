@@ -10,16 +10,16 @@ interface HueRotateControlsProps {
 function HueRotateControls({ filter, onChange }: HueRotateControlsProps) {
     const [degrees, setDegrees] = useState(filter.degrees);
     const sliderRef = useRef<HTMLInputElement>(null);
+    const debounceTimerRef = useRef<number | null>(null);
 
     useEffect(() => {
         setDegrees(filter.degrees);
     }, [filter]);
 
-    // Update slider overlay based on value
+    // Update slider overlay based on value (instant)
     useEffect(() => {
         if (sliderRef.current) {
             const percentage = (degrees / 360) * 100;
-            // For the hue slider, we'll use a semi-transparent overlay approach
             sliderRef.current.style.setProperty('--fill-percentage', `${percentage}%`);
         }
     }, [degrees]);
@@ -27,7 +27,14 @@ function HueRotateControls({ filter, onChange }: HueRotateControlsProps) {
     const handleDegreesChange = (value: number) => {
         setDegrees(value);
         filter.degrees = value;
-        onChange?.();
+
+        // Debounce the actual filter application
+        if (debounceTimerRef.current) {
+            clearTimeout(debounceTimerRef.current);
+        }
+        debounceTimerRef.current = setTimeout(() => {
+            onChange?.();
+        }, 150);
     };
 
     return (

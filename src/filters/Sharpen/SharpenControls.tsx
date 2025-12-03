@@ -10,23 +10,31 @@ interface SharpenControlsProps {
 function SharpenControls({ filter, onChange }: SharpenControlsProps) {
     const [amount, setAmount] = useState(filter.amount);
     const amountRef = useRef<HTMLInputElement>(null);
+    const debounceTimerRef = useRef<number | null>(null);
 
     useEffect(() => {
         setAmount(filter.amount);
     }, [filter]);
 
-    // Update slider background based on value
+    // Update slider background based on value (instant)
     useEffect(() => {
         if (amountRef.current) {
             const percentage = ((amount - 0) / (3 - 0)) * 100;
-            amountRef.current.style.background = `linear-gradient(to right, #4caf50 0%, #4caf50 ${percentage}%, #444 ${percentage}%, #444 100%)`;
+            amountRef.current.style.setProperty('--value-percentage', `${percentage}%`);
         }
     }, [amount]);
 
     const handleAmountChange = (value: number) => {
         setAmount(value);
         filter.amount = value;
-        onChange?.();
+
+        // Debounce the actual filter application
+        if (debounceTimerRef.current) {
+            clearTimeout(debounceTimerRef.current);
+        }
+        debounceTimerRef.current = setTimeout(() => {
+            onChange?.();
+        }, 150);
     };
 
     return (

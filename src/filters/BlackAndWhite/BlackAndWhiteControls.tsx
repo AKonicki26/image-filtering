@@ -12,37 +12,52 @@ function BlackAndWhiteControls({ filter, onChange }: BlackAndWhiteControlsProps)
     const [brightness, setBrightness] = useState(filter.brightness);
     const contrastRef = useRef<HTMLInputElement>(null);
     const brightnessRef = useRef<HTMLInputElement>(null);
+    const debounceTimerRef = useRef<number | null>(null);
 
     useEffect(() => {
         setContrast(filter.contrast);
         setBrightness(filter.brightness);
     }, [filter]);
 
-    // Update slider backgrounds based on values
+    // Update slider backgrounds based on values (instant)
     useEffect(() => {
         if (contrastRef.current) {
             const percentage = ((contrast - (-100)) / (100 - (-100))) * 100;
-            contrastRef.current.style.background = `linear-gradient(to right, #888 0%, #888 ${percentage}%, #444 ${percentage}%, #444 100%)`;
+            contrastRef.current.style.setProperty('--value-percentage', `${percentage}%`);
         }
     }, [contrast]);
 
     useEffect(() => {
         if (brightnessRef.current) {
             const percentage = ((brightness - (-100)) / (100 - (-100))) * 100;
-            brightnessRef.current.style.background = `linear-gradient(to right, #888 0%, #888 ${percentage}%, #444 ${percentage}%, #444 100%)`;
+            brightnessRef.current.style.setProperty('--value-percentage', `${percentage}%`);
         }
     }, [brightness]);
 
     const handleContrastChange = (value: number) => {
         setContrast(value);
         filter.contrast = value;
-        onChange?.();
+
+        // Debounce the actual filter application
+        if (debounceTimerRef.current) {
+            clearTimeout(debounceTimerRef.current);
+        }
+        debounceTimerRef.current = setTimeout(() => {
+            onChange?.();
+        }, 150);
     };
 
     const handleBrightnessChange = (value: number) => {
         setBrightness(value);
         filter.brightness = value;
-        onChange?.();
+
+        // Debounce the actual filter application
+        if (debounceTimerRef.current) {
+            clearTimeout(debounceTimerRef.current);
+        }
+        debounceTimerRef.current = setTimeout(() => {
+            onChange?.();
+        }, 150);
     };
 
     return (

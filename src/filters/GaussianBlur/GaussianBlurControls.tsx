@@ -12,37 +12,52 @@ function GaussianBlurControls({ filter, onChange }: GaussianBlurControlsProps) {
     const [sigma, setSigma] = useState(filter.sigma);
     const radiusRef = useRef<HTMLInputElement>(null);
     const sigmaRef = useRef<HTMLInputElement>(null);
+    const debounceTimerRef = useRef<number | null>(null);
 
     useEffect(() => {
         setRadius(filter.radius);
         setSigma(filter.sigma);
     }, [filter]);
 
-    // Update slider background based on value
+    // Update slider background based on value (this is instant)
     useEffect(() => {
         if (radiusRef.current) {
             const percentage = ((radius - 1) / (10 - 1)) * 100;
-            radiusRef.current.style.background = `linear-gradient(to right, #646cff 0%, #646cff ${percentage}%, #444 ${percentage}%, #444 100%)`;
+            radiusRef.current.style.setProperty('--value-percentage', `${percentage}%`);
         }
     }, [radius]);
 
     useEffect(() => {
         if (sigmaRef.current) {
             const percentage = ((sigma - 0.5) / (5 - 0.5)) * 100;
-            sigmaRef.current.style.background = `linear-gradient(to right, #646cff 0%, #646cff ${percentage}%, #444 ${percentage}%, #444 100%)`;
+            sigmaRef.current.style.setProperty('--value-percentage', `${percentage}%`);
         }
     }, [sigma]);
 
     const handleRadiusChange = (value: number) => {
         setRadius(value);
         filter.radius = value;
-        onChange?.();
+
+        // Debounce the actual filter application
+        if (debounceTimerRef.current) {
+            clearTimeout(debounceTimerRef.current);
+        }
+        debounceTimerRef.current = setTimeout(() => {
+            onChange?.();
+        }, 150); // Wait 150ms after user stops moving slider
     };
 
     const handleSigmaChange = (value: number) => {
         setSigma(value);
         filter.sigma = value;
-        onChange?.();
+
+        // Debounce the actual filter application
+        if (debounceTimerRef.current) {
+            clearTimeout(debounceTimerRef.current);
+        }
+        debounceTimerRef.current = setTimeout(() => {
+            onChange?.();
+        }, 150); // Wait 150ms after user stops moving slider
     };
 
     return (
