@@ -9,25 +9,28 @@ import {
     SaturationFilter,
     NoiseReductionFilter
 } from '../../filters';
+import { type FilterLayer, createFilterLayer } from '../../filters/FilterLayer';
+import LayerPanel from '../LayerPanel/LayerPanel';
 
 export default function ImageTransformer() {
     const [uploadedImage, setUploadedImage] = useState<string | null>(null);
     const [originalImageData, setOriginalImageData] = useState<ImageData | null>(null);
     const [filteredImage, setFilteredImage] = useState<string | null>(null);
-    const [activeFilterId, setActiveFilterId] = useState<string | null>(null);
+    const [filterLayers, setFilterLayers] = useState<FilterLayer[]>([]);
+    const [expandedLayerId, setExpandedLayerId] = useState<string | null>(null);
     const [isProcessing, setIsProcessing] = useState(false);
 
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    // Collection of available filters - this is where you add new filters!
-    const [filters] = useState<IImageFilter[]>([
+    // Available filter templates for creating new layers
+    const availableFilters: IImageFilter[] = [
         new GaussianBlurFilter(),
         new BlackAndWhiteFilter(),
         new HueRotateFilter(),
         new SharpenFilter(),
         new SaturationFilter(),
         new NoiseReductionFilter(),
-    ]);
+    ];
 
     // Load image and convert to ImageData
     const loadImageData = useCallback((src: string): Promise<ImageData> => {
@@ -77,7 +80,8 @@ export default function ImageTransformer() {
             reader.onload = async (e) => {
                 const result = e.target?.result as string;
                 setUploadedImage(result);
-                setActiveFilterId(null);
+                setFilterLayers([]);
+                setExpandedLayerId(null);
                 setFilteredImage(null);
 
                 // Load image data for processing
@@ -101,24 +105,17 @@ export default function ImageTransformer() {
         setUploadedImage(null);
         setOriginalImageData(null);
         setFilteredImage(null);
-        setActiveFilterId(null);
-
-        // Reset all filters
-        filters.forEach(filter => filter.reset());
+        setFilterLayers([]);
+        setExpandedLayerId(null);
 
         if (fileInputRef.current) {
             fileInputRef.current.value = '';
         }
     };
 
-    const applyActiveFilter = useCallback(async () => {
-        if (!originalImageData || !activeFilterId) {
-            setFilteredImage(null);
-            return;
-        }
-
-        const filter = filters.find(f => f.id === activeFilterId);
-        if (!filter) {
+    // Apply all filter layers sequentially
+    const applyFilterLayers = useCallback(async () => {
+        if (!originalImageData || filterLayers.length === 0) {
             setFilteredImage(null);
             return;
         }
@@ -126,34 +123,79 @@ export default function ImageTransformer() {
         setIsProcessing(true);
 
         try {
-            // Apply the filter using the common interface
-            const processedData = filter.apply(originalImageData);
-            const dataURL = imageDataToDataURL(processedData);
+            // Start with original image data
+            let output = originalImageData;
+
+            // Apply each enabled layer in sequence
+            for (const layer of filterLayers) {
+                if (layer.enabled) {
+                    output = layer.filter.apply(output);
+                }
+            }
+
+            const dataURL = imageDataToDataURL(output);
             setFilteredImage(dataURL);
         } catch (error) {
-            console.error('Error applying filter:', error);
+            console.error('Error applying filters:', error);
         } finally {
             setIsProcessing(false);
         }
-    }, [originalImageData, activeFilterId, filters, imageDataToDataURL]);
+    }, [originalImageData, filterLayers, imageDataToDataURL]);
 
-    const handleFilterSelect = (filterId: string) => {
-        setActiveFilterId(filterId);
+    // Add a new filter layer
+    const handleAddFilter = (filterTemplate: IImageFilter) => {
+        const newLayer = createFilterLayer(filterTemplate, filterLayers.length);
+        setFilterLayers(prev => [...prev, newLayer]);
+        setExpandedLayerId(newLayer.id);
     };
 
-    const handleFilterChange = () => {
-        // Re-apply filter when controls change
-        applyActiveFilter();
+    // Toggle layer enabled/disabled
+    const handleToggleLayer = (layerId: string) => {
+        setFilterLayers(prev =>
+            prev.map(layer =>
+                layer.id === layerId
+                    ? { ...layer, enabled: !layer.enabled }
+                    : layer
+            )
+        );
     };
 
-    // Apply filter when active filter changes
-    useEffect(() => {
-        if (activeFilterId) {
-            applyActiveFilter();
+    // Delete a layer
+    const handleDeleteLayer = (layerId: string) => {
+        setFilterLayers(prev => prev.filter(layer => layer.id !== layerId));
+        if (expandedLayerId === layerId) {
+            setExpandedLayerId(null);
         }
-    }, [activeFilterId, applyActiveFilter]);
+    };
 
-    const activeFilter = filters.find(f => f.id === activeFilterId);
+    // Move layer up or down
+    const handleMoveLayer = (layerId: string, direction: 'up' | 'down') => {
+        setFilterLayers(prev => {
+            const index = prev.findIndex(layer => layer.id === layerId);
+            if (index === -1) return prev;
+
+            const newIndex = direction === 'up' ? index - 1 : index + 1;
+            if (newIndex < 0 || newIndex >= prev.length) return prev;
+
+            const newLayers = [...prev];
+            [newLayers[index], newLayers[newIndex]] = [newLayers[index], newLayers[newIndex]];
+            return newLayers;
+        });
+    };
+
+    // Toggle expanded layer
+    const handleToggleExpanded = (layerId: string) => {
+        setExpandedLayerId(prev => prev === layerId ? null : layerId);
+    };
+
+    // Re-apply filters when layers change or filter settings change
+    useEffect(() => {
+        if (filterLayers.length > 0) {
+            applyFilterLayers();
+        } else {
+            setFilteredImage(null);
+        }
+    }, [filterLayers, applyFilterLayers]);
 
     return (
         <div className="image-transformer">
@@ -188,32 +230,30 @@ export default function ImageTransformer() {
             {uploadedImage && (
                 <>
                     <div className="filter-controls">
-                        <h2>Available Filters</h2>
+                        <h2>Add Filters</h2>
                         <div className="filter-buttons">
-                            <button
-                                className={`filter-btn ${!activeFilterId ? 'active' : ''}`}
-                                onClick={() => setActiveFilterId(null)}
-                            >
-                                No Filter
-                            </button>
-                            {filters.map(filter => (
+                            {availableFilters.map(filter => (
                                 <button
                                     key={filter.id}
-                                    className={`filter-btn ${activeFilterId === filter.id ? 'active' : ''}`}
-                                    onClick={() => handleFilterSelect(filter.id)}
+                                    className="filter-btn"
+                                    onClick={() => handleAddFilter(filter)}
                                     title={filter.description}
                                 >
-                                    {filter.name}
+                                    + {filter.name}
                                 </button>
                             ))}
                         </div>
-
-                        {activeFilter && (
-                            <div className="filter-settings">
-                                {activeFilter.getControls(handleFilterChange)}
-                            </div>
-                        )}
                     </div>
+
+                    <LayerPanel
+                        layers={filterLayers}
+                        expandedLayerId={expandedLayerId}
+                        onToggleLayer={handleToggleLayer}
+                        onDeleteLayer={handleDeleteLayer}
+                        onMoveLayer={handleMoveLayer}
+                        onToggleExpanded={handleToggleExpanded}
+                        onFilterChange={applyFilterLayers}
+                    />
 
                     <div className="image-display">
                         <div className="image-container">
@@ -225,7 +265,7 @@ export default function ImageTransformer() {
                             />
                         </div>
 
-                        {activeFilterId && (
+                        {filterLayers.length > 0 && (
                             <div className="image-container">
                                 <h2>Filtered Image</h2>
                                 {isProcessing ? (
