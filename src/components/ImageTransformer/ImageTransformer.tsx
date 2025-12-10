@@ -1,6 +1,14 @@
-import { useState, useRef, type ChangeEvent, useCallback } from 'react';
+import { useState, useRef, useEffect, type ChangeEvent, useCallback } from 'react';
 import './ImageTransformer.css';
-import {type IImageFilter, GaussianBlurFilter, BlackAndWhiteFilter, HueRotateFilter, SharpenFilter } from '../../filters';
+import {
+    type IImageFilter,
+    GaussianBlurFilter,
+    BlackAndWhiteFilter,
+    HueRotateFilter,
+    SharpenFilter,
+    SaturationFilter,
+    NoiseReductionFilter
+} from '../../filters';
 
 export default function ImageTransformer() {
     const [uploadedImage, setUploadedImage] = useState<string | null>(null);
@@ -17,6 +25,8 @@ export default function ImageTransformer() {
         new BlackAndWhiteFilter(),
         new HueRotateFilter(),
         new SharpenFilter(),
+        new SaturationFilter(),
+        new NoiseReductionFilter(),
     ]);
 
     // Load image and convert to ImageData
@@ -137,11 +147,11 @@ export default function ImageTransformer() {
     };
 
     // Apply filter when active filter changes
-    useState(() => {
+    useEffect(() => {
         if (activeFilterId) {
             applyActiveFilter();
         }
-    });
+    }, [activeFilterId, applyActiveFilter]);
 
     const activeFilter = filters.find(f => f.id === activeFilterId);
 

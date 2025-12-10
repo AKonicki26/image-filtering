@@ -6,3 +6,5 @@ export { GaussianBlurFilter } from './GaussianBlur/GaussianBlurFilter';
 export { BlackAndWhiteFilter } from './BlackAndWhite/BlackAndWhiteFilter';
 export { HueRotateFilter } from './HueRotate/HueRotateFilter.tsx';
 export { SharpenFilter } from './Sharpen/SharpenFilter';
+export { SaturationFilter } from './Saturation/SaturationFilter';
+export { NoiseReductionFilter } from './NoiseReduction/NoiseReductionFilter';
