@@ -178,7 +178,7 @@ export default function ImageTransformer() {
             if (newIndex < 0 || newIndex >= prev.length) return prev;
 
             const newLayers = [...prev];
-            [newLayers[index], newLayers[newIndex]] = [newLayers[index], newLayers[newIndex]];
+            [newLayers[newIndex], newLayers[index]] = [newLayers[index], newLayers[newIndex]];
             return newLayers;
         });
     };
